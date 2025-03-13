@@ -18,6 +18,8 @@ public class Account {
     private boolean situacao;
     private String tipo;
 
+    public Account() {}
+
     public Account(Long id, String numero, String agencia, String nomeTitular, String cpfTitular, LocalDate dataAbertura, double saldo, boolean situacao, String tipo) {
         this.id = id;
         this.numero = numero;

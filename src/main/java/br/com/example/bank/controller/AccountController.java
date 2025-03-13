@@ -59,4 +59,42 @@ public class AccountController {
         return ResponseEntity.ok("Conta encerrada com sucesso");
     }
 
+    @PutMapping("/{id}/deposito")
+    public ResponseEntity<?> depositar(@PathVariable Long id, @RequestBody double valor){
+        Account account = repository.searchById(id);
+
+        if(account == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Conta não encontrada");
+
+        if (valor <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Valor inválido");
+
+        account.setSaldo(account.getSaldo() + valor);
+        return ResponseEntity.ok(account);
+    }
+
+    @PutMapping("/{id}/saque")
+    public ResponseEntity<?> sacar(@PathVariable Long id, @RequestBody double valor) {
+        Account account = repository.searchById(id);
+
+        if (account == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Conta não encontrada");
+
+        if (valor <= 0 || valor > account.getSaldo()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Saldo insuficiente");
+
+        account.setSaldo(account.getSaldo() - valor);
+        return ResponseEntity.ok(account);
+    }
+
+    @PutMapping("/pix")
+    public ResponseEntity<?> pix(@RequestParam Long idOrigin, @RequestParam Long idDestination, @RequestParam double valor){
+        Account origin = repository.searchById(idOrigin);
+        Account destination = repository.searchById(idDestination);
+
+        if (origin == null || destination == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Conta não encontrada");
+
+        if (valor <= 0 || valor > origin.getSaldo()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Saldo insuficiente");
+
+        origin.setSaldo(origin.getSaldo() - valor);
+        destination.setSaldo(destination.getSaldo() + valor);
+
+        return ResponseEntity.ok(origin);
+    }
 }
